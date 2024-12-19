@@ -84,6 +84,8 @@ public class Board {
         }
     }
 
+
+
     /** Paint itself on the graphics canvas, given the Graphics context */
     public void paint(Graphics g) {
         // Draw the grid-lines

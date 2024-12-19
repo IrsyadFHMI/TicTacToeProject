@@ -3,6 +3,7 @@ package tictactoe;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+
 /**
  * Tic-Tac-Toe: Two-player Graphic version with better OO design.
  * The Board and Cell classes are separated in their own classes.
@@ -23,6 +24,7 @@ public class TicTacToe extends JPanel {
     private State currentState;  // the current state of the game
     private Seed currentPlayer;  // the current player
     private JLabel statusBar;    // for displaying status message
+    private AIPlayer aiPlayer;   // AI player to play against
 
     /** Constructor to setup the UI and game components */
     public TicTacToe() {
@@ -37,18 +39,24 @@ public class TicTacToe extends JPanel {
                 int row = mouseY / Cell.SIZE;
                 int col = mouseX / Cell.SIZE;
 
-                if (currentState == State.PLAYING) {
-                    SoundEffect.EAT_FOOD.play();
+                if (currentState == State.PLAYING && currentPlayer == Seed.CROSS) { // Only human can play when it's their turn
+                    SoundEffect.Playing.play();
                     if (row >= 0 && row < Board.ROWS && col >= 0 && col < Board.COLS
                             && board.cells[row][col].content == Seed.NO_SEED) {
                         // Update cells[][] and return the new game state after the move
                         currentState = board.stepGame(currentPlayer, row, col);
-                        // Switch player
-                        currentPlayer = (currentPlayer == Seed.CROSS) ? Seed.NOUGHT : Seed.CROSS;
+                        // Switch player to AI
+                        currentPlayer = Seed.NOUGHT;
+
+                        // Now, let the AI make its move
+                        if (currentState == State.PLAYING) {
+                            aiMove();
+                        }
                     }
-                } else {
-                    SoundEffect.DIE.play();// game over
-                    newGame();  // restart the game
+                } else if (currentState != State.PLAYING) {
+                    // Game over: restart the game
+                    SoundEffect.DIE.play();
+                    newGame();
                 }
                 // Refresh the drawing canvas
                 repaint();  // Callback paintComponent().
@@ -78,6 +86,7 @@ public class TicTacToe extends JPanel {
     /** Initialize the game (run once) */
     public void initGame() {
         board = new Board();  // allocate the game-board
+        aiPlayer = new AIPlayerMinimax(board); // Initialize the AI player using Minimax strategy
     }
 
     /** Reset the game-board contents and the current-state, ready for new game */
@@ -87,10 +96,24 @@ public class TicTacToe extends JPanel {
                 board.cells[row][col].content = Seed.NO_SEED; // all cells empty
             }
         }
-        currentPlayer = Seed.CROSS;    // cross plays first
+        currentPlayer = Seed.CROSS;    // human (cross) plays first
         currentState = State.PLAYING;  // ready to play
     }
 
+    /** Make a move for the AI */
+    private void aiMove() {
+        int[] aiMove = aiPlayer.move();
+        int row = aiMove[0];
+        int col = aiMove[1];
+
+        // Update cells[][] and return the new game state after the move
+        currentState = board.stepGame(currentPlayer, row, col);
+
+        // Switch player to human
+        currentPlayer = Seed.CROSS;
+
+        repaint();  // Refresh the screen after AI move
+    }
 
     /** Custom painting codes on this JPanel */
     @Override
@@ -103,7 +126,7 @@ public class TicTacToe extends JPanel {
         // Print status-bar message
         if (currentState == State.PLAYING) {
             statusBar.setForeground(Color.BLACK);
-            statusBar.setText((currentPlayer == Seed.CROSS) ? "X's Turn" : "O's Turn");
+            statusBar.setText((currentPlayer == Seed.CROSS) ? "X's Turn (You)" : "O's Turn (AI)");
         } else if (currentState == State.DRAW) {
             statusBar.setForeground(Color.RED);
             statusBar.setText("It's a Draw! Click to play again.");
