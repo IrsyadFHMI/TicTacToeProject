@@ -1,6 +1,15 @@
+/**
+ * ES234317-Algorithm and Data Structures
+ * Semester Ganjil, 2024/2025
+ * Group Capstone Project
+ * Group #7
+ * 1 - 5026221163 - Mohammad Geresidi Rachmadi
+ * 2 - 5026221187 - Muhammad Irsyad Fahmi
+ */
 package tictactoe;
 
 import java.awt.*;
+
 /**
  * The Board class models the ROWS-by-COLS game board.
  */
@@ -8,13 +17,15 @@ public class Board {
     // Define named constants
     public static final int ROWS = 3;  // ROWS x COLS cells
     public static final int COLS = 3;
+
     // Define named constants for drawing
+    public static final int Y_OFFSET = 1;  // Fine tune for better display
     public static final int CANVAS_WIDTH = Cell.SIZE * COLS;  // the drawing canvas
-    public static final int CANVAS_HEIGHT = Cell.SIZE * ROWS;
+    public static final int CANVAS_HEIGHT = Cell.SIZE * ROWS + Y_OFFSET;  // Adjust height to prevent cutting off
     public static final int GRID_WIDTH = 8;  // Grid-line's width
     public static final int GRID_WIDTH_HALF = GRID_WIDTH / 2; // Grid-line's half-width
     public static final Color COLOR_GRID = Color.LIGHT_GRAY;  // grid lines
-    public static final int Y_OFFSET = 1;  // Fine tune for better display
+
 
     // Define properties (package-visible)
     /** Composes of 2D array of ROWS-by-COLS Cell instances */
@@ -84,28 +95,27 @@ public class Board {
         }
     }
 
-
-
     /** Paint itself on the graphics canvas, given the Graphics context */
-    public void paint(Graphics g) {
-        // Draw the grid-lines
+    public void paint(Graphics g, int width, int height) {
+        int cellWidth = width / COLS;
+        int cellHeight = (height - Y_OFFSET) / ROWS;  // Adjust cell height with Y_OFFSET
+
+        // Draw grid lines
         g.setColor(COLOR_GRID);
         for (int row = 1; row < ROWS; ++row) {
-            g.fillRoundRect(0, Cell.SIZE * row - GRID_WIDTH_HALF,
-                    CANVAS_WIDTH - 1, GRID_WIDTH,
-                    GRID_WIDTH, GRID_WIDTH);
+            g.fillRect(0, (cellHeight * row) + Y_OFFSET, width, GRID_WIDTH);  // Adjust grid line position
         }
         for (int col = 1; col < COLS; ++col) {
-            g.fillRoundRect(Cell.SIZE * col - GRID_WIDTH_HALF, 0 + Y_OFFSET,
-                    GRID_WIDTH, CANVAS_HEIGHT - 1,
-                    GRID_WIDTH, GRID_WIDTH);
+            g.fillRect(cellWidth * col, Y_OFFSET, GRID_WIDTH, height);  // Adjust grid line position
         }
 
-        // Draw all the cells
+        // Draw all cells
         for (int row = 0; row < ROWS; ++row) {
             for (int col = 0; col < COLS; ++col) {
-                cells[row][col].paint(g);  // ask the cell to paint itself
+                // Adjust the position of the cell to account for Y_OFFSET
+                cells[row][col].paint(g, col * cellWidth, (row * cellHeight) + Y_OFFSET, cellWidth, cellHeight);
             }
         }
     }
+
 }

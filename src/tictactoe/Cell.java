@@ -1,3 +1,11 @@
+/**
+ * ES234317-Algorithm and Data Structures
+ * Semester Ganjil, 2024/2025
+ * Group Capstone Project
+ * Group #7
+ * 1 - 5026221163 - Mohammad Geresidi Rachmadi
+ * 2 - 5026221187 - Muhammad Irsyad Fahmi
+ */
 package tictactoe;
 
 import java.awt.*;
@@ -32,12 +40,10 @@ public class Cell {
 
     /** Paint itself on the graphics canvas, given the Graphics context */
     /** Paint itself on the graphics canvas, given the Graphics context */
-    public void paint(Graphics g) {
-        // Draw the Seed if it is not empty
-        int x1 = col * SIZE + PADDING;
-        int y1 = row * SIZE + PADDING;
+    public void paint(Graphics g, int x, int y, int width, int height) {
         if (content == Seed.CROSS || content == Seed.NOUGHT) {
-            g.drawImage(content.getImage(), x1, y1, SEED_SIZE, SEED_SIZE, null);
+            g.drawImage(content.getImage(), x + PADDING, y + PADDING, width - 2 * PADDING, height - 2 * PADDING, null);
         }
     }
+
 }
